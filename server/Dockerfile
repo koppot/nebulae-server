@@ -25,7 +25,7 @@ COPY . .
 RUN pnpm build
 
 # --- Stage 2: compile the headless bridge binary ----------------------------
-FROM rust:1.83-slim AS builder
+FROM rust:1-slim AS builder
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libwebkit2gtk-4.1-dev \
         libgtk-3-dev \
