@@ -160,3 +160,25 @@ This guide was written before the first container image existed. It's published 
 
 Everything else — ports, token, data directory, watch folder, connection steps — is exactly as documented above.
 ````
+
+## Alternative to Message 8 — supplement if the original guide is already posted
+
+If the original 7-message edition is already up in the channel, do not repost
+it in full. Post this single supplement message instead; it covers only what
+changed and what to do differently.
+
+````
+**Supplement to the Unraid install guide — what changed since I posted it**
+
+The server's first release is out, so a few things from the original post are now different:
+
+• **The container image is live and public.** The old troubleshooting note about the package not being public yet no longer applies: `ghcr.io/koppot/nebulae-server:beta` now pulls anonymously. If your original install failed at the pull step, just pull again and continue with the same config.
+
+• **Desktop app: must be v0.1.0-beta.8 or newer.** The Server tab (Settings → Server) first appeared in beta.8. Older betas have no Server tab and cannot connect. Update from `github.com/koppot/Nebulae-torrent_client/releases` — steps 4-5 of the guide are unchanged.
+
+• **Windows installer is unsigned (intentional).** The project's free code-signing application was declined, so SmartScreen will warn on first launch: More info → Run anyway. Verify your download against `SHA256SUMS.txt` (or the per-file `.sha256`) before running; each release also publishes `WINDOWS-SIGNING-STATUS.txt`.
+
+• **Two repos:** server deployment (the container in this guide) = `koppot/nebulae-server`; desktop app releases = `koppot/Nebulae-torrent_client`.
+
+• **Everything else is unchanged:** ports, API token, `/data` mapping, watch folder, container config, and updating via the `:beta` tag.
+````
