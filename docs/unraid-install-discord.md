@@ -2,7 +2,7 @@
 
 Discord-ready rewrite of `docs/unraid-install.md`. Discord does not render
 tables or horizontal rules and caps a message at 2,000 characters, so this
-version is plain bullets plus code fences, split into 7 messages. Every block
+version is plain bullets plus code fences, split into 8 messages. Every block
 below fits a single message with room to spare.
 
 **How to post:** for each message below, copy everything inside the
@@ -12,7 +12,7 @@ the exact copy boundaries. Do not merge messages; post them one by one.
 
 ---
 
-## MESSAGE 1 of 7 — Intro
+## MESSAGE 1 of 8 — Intro
 
 ````
 **Nebulae Server — Unraid Install Guide (Beta)**
@@ -27,13 +27,13 @@ The two run side by side in the container and talk over a local socket. Only two
 
 **What you need:**
 • Unraid 6.x with the Docker service enabled
-• The Nebulae desktop app on your computer (grab the installer from the project's GitHub Releases page)
+• The Nebulae desktop app on your computer (grab the installer from `github.com/koppot/Nebulae-torrent_client/releases` — where the desktop releases are published)
 • Your Unraid server IP, e.g. `192.168.1.10`
 ````
 
 ---
 
-## MESSAGE 2 of 7 — Install the container
+## MESSAGE 2 of 8 — Install the container
 
 ````
 **Step 1 — Install the container**
@@ -51,7 +51,7 @@ Not showing up in your app feed yet? Add it manually instead:
 
 ---
 
-## MESSAGE 3 of 7 — Configure the container
+## MESSAGE 3 of 8 — Configure the container
 
 ````
 **Step 2 — Configure the container**
@@ -67,7 +67,7 @@ Click **APPLY** and wait for the image to pull and the container to start.
 
 ---
 
-## MESSAGE 4 of 7 — Folder layout + verify
+## MESSAGE 4 of 8 — Folder layout + verify
 
 ````
 **Inside the data directory** (the container creates these):
@@ -90,7 +90,7 @@ Seeing `FATAL: rtorrent SCGI socket did not appear`? Stop the container and star
 
 ---
 
-## MESSAGE 5 of 7 — Connect the desktop app
+## MESSAGE 5 of 8 — Connect the desktop app
 
 ````
 **Step 4 — Connect the desktop app**
@@ -109,7 +109,7 @@ After the restart the whole app runs against the server: the transfer list, add 
 
 ---
 
-## MESSAGE 6 of 7 — Everyday use + updating + security
+## MESSAGE 6 of 8 — Everyday use + updating + security
 
 ````
 **Everyday use**
@@ -129,15 +129,34 @@ The `:beta` tag is updated with each beta release. **DOCKER** tab → **Check fo
 
 ---
 
-## MESSAGE 7 of 7 — Troubleshooting
+## MESSAGE 7 of 8 — Troubleshooting
 
 ````
 **Troubleshooting**
 
 • **Test connection fails with 401 / unauthorized** — the token in the app doesn't match the container's API Token. Copy it again exactly: no quotes, no trailing spaces.
 • **Connection refused / timeout** — wrong IP or port, container not started, or a firewall in between. Confirm the log shows the bridge started and that `http://<ip>:9174` answers on your LAN.
+• **Docker pull fails (denied / manifest unknown)** — the package went private or was renamed. Confirm the image path is exactly `ghcr.io/koppot/nebulae-server:beta` and that the package is public (it is, as of the first release).
 • **App connects but no download speed** — open the BitTorrent port: forward/host-firewall TCP 6881, and keep UDP 6881 mapped for DHT. Also check the swarm has seeds.
 • **Downloads go to the wrong place** — the location defaults to `/data/downloads` (= your mapped data directory). Set the location per torrent in the app if you moved the mapping.
 • **Port 6881 already in use by another container** — change the host side of the mapping (e.g. `6882:6881`); the app and peers follow the host port automatically.
 • **Want to wipe everything** — stop the container and delete the data directory's contents. The image is replaced on update; your data isn't.
+````
+
+## MESSAGE 8 of 8 — Addendum (first release is live)
+
+````
+**Addendum — first server release is live (2026-10-14)**
+
+This guide was written before the first container image existed. It's published now, and everything above works as written.
+
+• **The image is real and public.** `ghcr.io/koppot/nebulae-server:beta` is up and anonymously pullable. Sanity-check from any machine first: `docker pull ghcr.io/koppot/nebulae-server:beta`
+
+• **Desktop app: use v0.1.0-beta.8 or newer.** Server mode (Settings → Server) first appeared in beta.8 on `github.com/koppot/Nebulae-torrent_client/releases`. beta.7 and older have no Server tab and cannot connect — update before Step 4.
+
+• **Windows is unsigned by design.** The project's free-signing application was declined, so the beta.8 installer is unsigned: SmartScreen will warn — "More info" → "Run anyway". Verify the download against `SHA256SUMS.txt` (or the per-file `.sha256`) first; each release also publishes `WINDOWS-SIGNING-STATUS.txt` stating the signing status in plain text.
+
+• **Two repos, two jobs:** server deployment (this guide) = `koppot/nebulae-server`; desktop app releases = `koppot/Nebulae-torrent_client`.
+
+Everything else — ports, token, data directory, watch folder, connection steps — is exactly as documented above.
 ````
