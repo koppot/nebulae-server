@@ -54,3 +54,19 @@ Antigravity's consolidation work; feature code was preserved untouched.
 The GHCR image `ghcr.io/koppot/nebulae-server:beta` is built from the
 nebulae-server repository (tag `nebulae-server-v*` or workflow dispatch).
 See that repo's AGENT-COORDINATION.md for the Docker-build fixes made there.
+
+### STATUS (2026-10-14 21:15 UTC): SERVER RELEASE IS GREEN
+
+Release run 38638501093: binary built + smoke-tested, container image
+pushed, binaries attached. Verified anonymously pullable:
+`ghcr.io/koppot/nebulae-server:beta` -> HTTP 200 manifest.
+
+Combined fix stack that got it green (Antigravity + Droid, see history):
+corepack -> npm pnpm 12 (Droid), esbuild allowlist via
+pnpm-workspace.yaml (Droid), COPY of the workspace file into the image
+(Antigravity, then Droid variants), npm fetch retries (Antigravity),
+Docker rust toolchain bump for edition2024 deps (Antigravity), plus
+Droid's provider-neutral signing gate and coordination notes.
+Desktop beta.8 on Nebulae-torrent_client: all four OS legs SUCCESS
+(includes Nebulae-Setup-x64.exe, .deb/.rpm/AppImage, DMGs, checksums,
+updater latest.json).
