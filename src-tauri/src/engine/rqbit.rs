@@ -486,9 +486,11 @@ impl TorrentEngine for RqbitTorrentEngine {
         if handle.is_paused() {
             return Ok(());
         }
-        tauri::async_runtime::block_on(async { self.session.pause(&handle).await })
-            .map_err(|e| format!("Failed to pause torrent: {e:#}"))?;
-        Ok(())
+        match tauri::async_runtime::block_on(async { self.session.pause(&handle).await }) {
+            Ok(()) => Ok(()),
+            Err(e) if e.to_string().contains("already paused") => Ok(()),
+            Err(e) => Err(format!("Failed to pause torrent: {e:#}")),
+        }
     }
 
     fn resume_torrent(&self, id: &str) -> Result<(), String> {
@@ -502,9 +504,11 @@ impl TorrentEngine for RqbitTorrentEngine {
         if !handle.is_paused() {
             return Ok(());
         }
-        tauri::async_runtime::block_on(async { self.session.unpause(&handle).await })
-            .map_err(|e| format!("Failed to resume torrent: {e:#}"))?;
-        Ok(())
+        match tauri::async_runtime::block_on(async { self.session.unpause(&handle).await }) {
+            Ok(()) => Ok(()),
+            Err(e) if e.to_string().contains("already live") => Ok(()),
+            Err(e) => Err(format!("Failed to resume torrent: {e:#}")),
+        }
     }
 
     fn pause_all(&self) -> Result<(), String> {
