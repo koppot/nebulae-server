@@ -1,72 +1,50 @@
-# Agent coordination notes
+# Agent coordination notes — 2026-10-14
 
-## 2026-10-14 — Droid (Factory) session
+Two agents shipped the first public betas today under the owner's direct
+instruction: **Droid** (Factory) and **Antigravity**. This note documents
+who changed what and why. Feature work from both sides was preserved
+throughout; do not revert pipeline fixes without checking the releases
+below.
 
-Modifications in this repository were made by **Droid** (Factory's coding
-agent), working at the direct instruction of the repository owner (koppot).
-This note is left so Antigravity — and any other agent or contributor —
-can see what was changed here and why. Nothing here is meant to step on
-Antigravity's consolidation work; feature code was preserved untouched.
+## koppot/nebulae-server (this repo) — SERVER RELEASE IS GREEN
 
-### Changes on koppot/Nebulae-torrent_client (this repo)
+- Droid: repo created from the shared codebase (owner instruction:
+  server deployment lives only here). Dockerfile frontend stage switched
+  from corepack to `npm i -g pnpm@12` (corepack signature keys break in
+  image builds); `pnpm-workspace.yaml` with
+  `onlyBuiltDependencies: [esbuild]` added (pnpm 12 no longer reads the
+  `pnpm` field in package.json and hard-fails on unapproved build
+  scripts — ERR_PNPM_IGNORED_BUILDS).
+- Antigravity: copied `pnpm-workspace.yaml*` into the Docker build
+  context, added `--fetch-retries=5` to the pnpm install, bumped the
+  builder to `rust:1-slim` for edition2024 crates, upgraded
+  pnpm/action-setup to v4, and made rqbit pause/resume idempotent
+  (007575e) — all verified by CI and the release run.
+- Release `nebulae-server-v0.1.0-beta.1` (tag = 007575e): binary +
+  SHA-256 attached; image `ghcr.io/koppot/nebulae-server:beta` pushed and
+  verified anonymously pullable (HTTP 200). main is one docs commit ahead
+  of the tag; the next `nebulae-server-v*` tag ships the media-engine
+  work.
+- Droid: `AGENT-COORDINATION.md` (this file), provider-neutral signing
+  documentation.
 
-- **SignPath decline recorded** (b0b7708 lineage): SignPath Foundation
-  DECLINED the OSS signing application (insufficient project history).
-  README / installation guide / release template / code-signing policy now
-  state that Windows beta builds are unsigned unless another provider is
-  configured. Wording implying acceptance, Foundation sponsorship, an
-  issued certificate, or signed artifacts was removed. The prepared SignPath
-  integration stays preserved but inactive (docs/signpath-ci-integration.md,
-  docs/signpath-application.md).
-- **Provider-neutral signing gate** in `.github/workflows/release.yml`:
-  repo variable `WINDOWS_SIGN_PROVIDER` (unset/none/unsigned = publish
-  unsigned and succeed; `signpath` = require the four SignPath values;
-  unknown = fail loudly). Gate renamed WINDOWS_SIGNING_ENABLED. The Windows
-  job publishes `WINDOWS-SIGNING-STATUS.txt` with every release, and the
-  release body carries a "Windows code signing status" section.
-- **Tauri updater signing wired** (0595136): `tauri.conf.json` enables
-  `createUpdaterArtifacts`, so `tauri build` requires
-  `TAURI_SIGNING_PRIVATE_KEY`(+PASSWORD) in the environment. The beta.8 run
-  failed on all four OS legs because the secrets were never passed to the
-  build env; they are now job-level env in release.yml. The beta.8 tag was
-  re-pointed accordingly.
-- **Client/server split** (3a863ad, owner's instruction): server deployment
-  (`server/` Docker packaging, headless bridge bin, server-release workflow,
-  deployment docs) was REMOVED from this repo and lives only in
-  **koppot/nebulae-server**. This repo keeps the client-side Server mode
-  (RemoteServerEngine, Settings -> Server) and a pointer stub at
-  docs/nebulae-server.md. The `nebulae-server` branch here was deleted
-  (content preserved in the other repo).
-- **VPN test fixture made scanner-safe** (55317c7): the ovpn-parser test's
-  fake PEM bodies read "TESTONLY-NOT-A-REAL-KEY..." — secret scanners had
-  been flagging the fixture.
+## koppot/Nebulae-torrent_client — DESKTOP BETA.8 RELEASE IS GREEN
 
-### Preserved as-is (Antigravity's work)
+- Droid: SignPath-decline documentation (application declined
+  2026-10-14, insufficient project history; Windows betas are unsigned by
+  design); provider-neutral signing gate (`WINDOWS_SIGN_PROVIDER`) +
+  per-release `WINDOWS-SIGNING-STATUS.txt`; Tauri updater signing secrets
+  wired into the release build (beta.8 originally failed all four OS legs
+  without them); client/server split at the owner's instruction (server
+  deployment removed here; `nebulae-server` branch deleted; pointer stub
+  at docs/nebulae-server.md); VPN test fixture made scanner-safe;
+  Unraid install guides (plain + Discord edition).
+- Antigravity: Windows compile fixes (os::unix scgi gate, Manager import),
+  rqbit engine improvements, media-station features, action-setup v4.
 
-- The consolidation merge (real engine, VPN/keychain, telemetry, media
-  station) and Antigravity's own Windows compile fixes (139029d) are kept
-  unchanged. Antigravity set the Tauri signing secrets on this repo —
-  thanks; the workflow wiring above is what makes the release build see
-  them.
+## Standing owner instructions
 
-### Server release status
-
-The GHCR image `ghcr.io/koppot/nebulae-server:beta` is built from the
-nebulae-server repository (tag `nebulae-server-v*` or workflow dispatch).
-See that repo's AGENT-COORDINATION.md for the Docker-build fixes made there.
-
-### STATUS (2026-10-14 21:15 UTC): SERVER RELEASE IS GREEN
-
-Release run 38638501093: binary built + smoke-tested, container image
-pushed, binaries attached. Verified anonymously pullable:
-`ghcr.io/koppot/nebulae-server:beta` -> HTTP 200 manifest.
-
-Combined fix stack that got it green (Antigravity + Droid, see history):
-corepack -> npm pnpm 12 (Droid), esbuild allowlist via
-pnpm-workspace.yaml (Droid), COPY of the workspace file into the image
-(Antigravity, then Droid variants), npm fetch retries (Antigravity),
-Docker rust toolchain bump for edition2024 deps (Antigravity), plus
-Droid's provider-neutral signing gate and coordination notes.
-Desktop beta.8 on Nebulae-torrent_client: all four OS legs SUCCESS
-(includes Nebulae-Setup-x64.exe, .deb/.rpm/AppImage, DMGs, checksums,
-updater latest.json).
+- SignPath is NOT an active signing provider; Windows betas ship unsigned
+  unless another provider is configured. Do not disable SmartScreen or
+  bypass security controls in docs or scripts.
+- Server deployment exists only in koppot/nebulae-server.
