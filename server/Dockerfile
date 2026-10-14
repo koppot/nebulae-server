@@ -13,9 +13,12 @@
 # The desktop Nebulae app connects to http://<server>:9174 with that token.
 
 # --- Stage 1: frontend (embedded by the Tauri build for the bin target) ----
-FROM node:20-slim AS frontend
+# pnpm is installed from npm instead of corepack: corepack's bundled
+# signature keys / default resolution fail in this stage, while the release
+# workflow pins pnpm 12 via pnpm/action-setup with the same lockfile.
+FROM node:22-slim AS frontend
 WORKDIR /src
-RUN corepack enable
+RUN npm install -g pnpm@12
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .
