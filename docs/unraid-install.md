@@ -1,6 +1,6 @@
 # Installing Nebulae Server on Unraid
 
-> Posting to Discord? Use the paste-ready 7-message edition:
+> Posting to Discord? Use the paste-ready 8-message edition:
 > **[docs/unraid-install-discord.md](unraid-install-discord.md)**.
 
 This guide walks you through installing Nebulae Server on an Unraid box and
@@ -8,6 +8,11 @@ connecting the Nebulae desktop app to it. When you are done, your torrents run
 on the server (rtorrent, started and managed by the container) while the
 Nebulae desktop app on your workstation drives them — same native interface,
 no web UI.
+
+> **Addendum (2026-10-14): the first server release is live.** The container
+> image and the matching desktop beta are published now — see
+> [the addendum at the bottom](#addendum--first-server-release-is-live-2026-10-14)
+> before you start.
 
 ## What gets installed
 
@@ -26,7 +31,8 @@ the bridge API port and the BitTorrent port.
 
 - Unraid 6.x with the Docker service enabled
 - The Nebulae desktop app installed on your computer (grab the installer for
-  your platform from the project's GitHub Releases page)
+  your platform from <https://github.com/koppot/Nebulae-torrent_client/releases>,
+  where the desktop releases are published)
 - Your Unraid server's IP address (e.g. `192.168.1.10`), reachable from the
   computer running the desktop app
 
@@ -131,7 +137,36 @@ The `:beta` image tag is updated with each beta release:
 | --- | --- |
 | **Test connection** fails with 401 / unauthorized | The token in the app does not match the container's **API Token**. Copy it again exactly; no quotes, no trailing spaces. |
 | Connection refused / timeout | Wrong IP or port; the container not started; or a firewall between workstation and server. Confirm the log shows the bridge started and that `http://<ip>:9174` answers on the LAN. |
+| Container pull fails (denied / manifest unknown) | The GHCR package is not public yet — a first publish can land as a private package. The owner flips it to public in the package's GitHub settings; until then Unraid cannot pull it anonymously. |
 | Container starts, app connects, but no download speed | Open the BitTorrent port: forward/host-firewall TCP 6881, and keep UDP 6881 mapped for DHT. Check that the swarm has seeds. |
 | Downloads go to the wrong place | The directory is set by the app per torrent and defaults to `/data/downloads` in the container — which is your mapped **Data directory**. If you moved the mapping, re-add torrents or set the location in the app. |
 | Port 6881 already in use by another container | In the container config, change the **host** side of the BitTorrent/DHT port mappings (e.g. `6882:6881`); the app and peers follow the host port automatically. |
 | Want to wipe everything | Stop the container and delete the data directory's contents. The container image itself is replaced on update, not your data. |
+
+## Addendum — first server release is live (2026-10-14)
+
+This guide was written before the first container image was published. It is
+real now, and the instructions work exactly as written. What changed since:
+
+1. **The image exists and is public.** `ghcr.io/koppot/nebulae-server:beta` is
+   published and anonymously pullable (verified). Step 1 — Community
+   Applications or manual Add Container — works as written. Sanity-check from
+   any machine before opening the Unraid UI:
+   `docker pull ghcr.io/koppot/nebulae-server:beta`
+2. **Desktop app: use v0.1.0-beta.8 or newer.** Server mode
+   (**Settings → Server**) first appeared in beta.8, published on
+   <https://github.com/koppot/Nebulae-torrent_client/releases>. beta.7 and
+   older have no Server tab and cannot connect — update before Step 4.
+3. **Windows is unsigned by design.** The project's free-signing application
+   (SignPath Foundation) was declined, so the beta.8 installer is unsigned:
+   SmartScreen will warn on first run — choose **More info** → **Run anyway**.
+   Verify the download against `SHA256SUMS.txt` (or the per-file `.sha256`)
+   before running; every release also publishes `WINDOWS-SIGNING-STATUS.txt`
+   stating the signing status in plain text. See
+   [docs/code-signing-policy.md](code-signing-policy.md).
+4. **Two repositories, two jobs.** Server deployment (this guide) lives in
+   `koppot/nebulae-server`; desktop app releases live in
+   `koppot/Nebulae-torrent_client`.
+
+Everything else — ports, token, data directory, watch folder, connection
+steps — is unchanged from the steps above.
