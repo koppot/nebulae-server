@@ -18,7 +18,7 @@
 # workflow pins pnpm 12 via pnpm/action-setup with the same lockfile.
 FROM node:22-slim AS frontend
 WORKDIR /src
-RUN npm install -g pnpm@12
+RUN npm install -g pnpm@12 --fetch-retries=5
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml* ./
 RUN pnpm install --frozen-lockfile
 COPY . .
