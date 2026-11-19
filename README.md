@@ -1,7 +1,7 @@
 > [!IMPORTANT]
 > **This repository is a legacy mirror of the Nebulae Server *beta* (rTorrent-based, image tag `:beta`). It is not the current implementation and is no longer the place to get Nebulae Server.**
 >
-> **Nebulae Server 0.2.8** runs **Transmission 4.1.3** plus the Nebulae bridge, is built and released from [koppot/Nebulae-torrent_client](https://github.com/koppot/Nebulae-torrent_client) (`server/`, `server/docker/`), and is published as the Docker image `ghcr.io/koppot/nebulae-server:0.2.8` (**linux/amd64**).
+> **Nebulae Server 0.2.8** is powered by **Nebulae Core** (built-in torrent engine), is built and released from [koppot/Nebulae-torrent_client](https://github.com/koppot/Nebulae-torrent_client) (`server/`, `server/docker/`), and is published as the Docker image `ghcr.io/koppot/nebulae-server:0.2.8` (**linux/amd64**).
 >
 > - **Setup guide (Docker, Compose, Windows/macOS/Linux/Unraid notes, desktop connection, security, trackers, troubleshooting):** [docs/nebulae-server.md](https://github.com/koppot/Nebulae-torrent_client/blob/main/docs/nebulae-server.md)
 > - Wiki summary: [Nebulae Server (Docker)](https://github.com/koppot/Nebulae-torrent_client/wiki/Nebulae-Server-Docker)
